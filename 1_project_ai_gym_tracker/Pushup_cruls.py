@@ -66,14 +66,14 @@ while cap.isOpened():
         cap.release()
         cv2.destroyAllWindows()
     cv2.waitKey(1)
-    """if (j==0):
+    if (j==0):
         t1 = threading.Thread(target=speak("Welcome! Please choose one of the following exercise modes to begin your workout"
                                            " : For Bicep crul press C "
                                            ",For pushup press P "
                                            ", For squat press S,"
                                            "  to close please press Q"))
         t1.start()
-        j += 1"""
+        j += 1
 if(i=='c'):
 
     def crul():
@@ -154,7 +154,10 @@ elif(i=='p'):
     count = 0
     direction = 0
     form = 0
+    acc=100
+    In_count=0
     feedback = "Fix Form"
+
 
     while cap.isOpened():
         ret, img = cap.read()  # 640 x 480
@@ -201,9 +204,29 @@ elif(i=='p'):
                     else:
                         feedback = "Fix Form"
                         # form = 0
+            if form == 0:
+                if per == 0:
+                    if elbow <= 90 and hip > 160:
+                        feedback = "Up"
+
+                    else:
+                        feedback = "Fix Form"
+                        In_count+=0.5
+
+                if per == 100:
+                    if elbow > 160 and shoulder > 40 and hip > 160:
+                        feedback = "Down"
+
+                    else:
+                        feedback = "Fix Form"
+                        In_count += 0.5
+
 
             print(count)
-
+            print(In_count)
+            if ((count+In_count)>0):
+                acc=(count-In_count)/(count+In_count)*100
+            print(acc)
             # Draw Bar
             if form == 1:
                 cv2.rectangle(img, (580, 50), (600, 380), (0, 255, 0), 3)
@@ -221,10 +244,17 @@ elif(i=='p'):
             cv2.putText(img, feedback, (500, 40), cv2.FONT_HERSHEY_PLAIN, 2,
                         (0, 255, 0), 2)
 
+            # Feedback
+            cv2.rectangle(img, (0, 40), (0, 40), (255, 255, 255), cv2.FILLED)
+            cv2.putText(img, str(acc)+"%", (0, 40), cv2.FONT_HERSHEY_PLAIN, 2,
+                        (0, 255, 0), 2)
+
         cv2.imshow('Pushup counter', img)
         if cv2.waitKey(10) & 0xFF == ord('q'):
             cap.release()
             cv2.destroyAllWindows()
+
+
 elif(i=='s'):
     detector = pm.poseDetector()
     count = 0
